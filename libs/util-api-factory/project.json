@@ -1,0 +1,16 @@
+{
+  "name": "util-api-factory",
+  "$schema": "../../node_modules/nx/schemas/project-schema.json",
+  "sourceRoot": "libs/util-api-factory/src",
+  "projectType": "library",
+  "targets": {
+    "lint": {
+      "executor": "@nx/linter:eslint",
+      "outputs": ["{options.outputFile}"],
+      "options": {
+        "lintFilePatterns": ["libs/util-api-factory/**/*.ts"]
+      }
+    }
+  },
+  "tags": []
+}
