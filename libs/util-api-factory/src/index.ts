@@ -1,2 +1,2 @@
-export * from './modules/factory/factory.module';
+export * from './modules';
 export * from './utils/api.utils';
