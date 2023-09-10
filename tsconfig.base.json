@@ -13,8 +13,12 @@
     "lib": ["es2020", "dom"],
     "skipLibCheck": true,
     "skipDefaultLibCheck": true,
+    "noPropertyAccessFromIndexSignature": false,
     "baseUrl": ".",
-    "paths": {}
+    "paths": {
+      "@MiN1One/api-factory": ["libs/util-api-factory/src/index.ts"],
+      "@MiN1One/interfaces": ["libs/interfaces/src/index.ts"]
+    }
   },
   "exclude": ["node_modules", "tmp"]
 }

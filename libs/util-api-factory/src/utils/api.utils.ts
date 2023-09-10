@@ -9,7 +9,7 @@ export const API_QUERY_KEYS = [
   'search',
   'sort',
   'populate'
-];
+]; 
 
 export class ApiFeatures<DocumentType> {
   constructor(
