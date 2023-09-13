@@ -9,6 +9,9 @@ import {
   ApartmentSchema,
 } from './apartment.schema';
 import { ApartmentService } from './apartment.service';
+import { Facility, FacilitySchema } from './facility.schema';
+import { Bill, BillSchema } from './bill.schema';
+import { ApartmentRule, ApartmentRuleSchema } from './apartment-rule.schema';
 
 @Module({
   controllers: [ApartmentController],
@@ -19,9 +22,12 @@ import { ApartmentService } from './apartment.service';
       imports: [
         MongooseModule.forFeature([
           { name: Apartment.name, schema: ApartmentSchema },
+          { name: Facility.name, schema: FacilitySchema },
+          { name: Bill.name, schema: BillSchema },
+          { name: ApartmentRule.name, schema: ApartmentRuleSchema },
         ]),
       ],
-      inject: [getModelToken(Apartment.name)]
+      inject: [getModelToken(Apartment.name)],
     }),
   ],
 })

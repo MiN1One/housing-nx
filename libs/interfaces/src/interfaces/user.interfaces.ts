@@ -14,6 +14,8 @@ export enum EUserTypes {
   MAINTAINER = 'Maintainer'
 }
 
+export const DEFAULT_USER: UserTypes = 'USER';
+
 export type UserTypes = keyof typeof EUserTypes;
 
 export type MaritalStatusTypes = keyof typeof EMaritalStatuses;

@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { AppService } from './app.service';
 import { ConfigModule, ConfigType } from '@nestjs/config';
 import { appConfigLoader } from './app.config';
-import { ApartmentModule } from '../apartments/apartments.module';
+import { ApartmentModule } from '../apartment/apartment.module';
 import { MongooseModule } from '@nestjs/mongoose';
 
 @Module({
@@ -11,7 +11,8 @@ import { MongooseModule } from '@nestjs/mongoose';
     ConfigModule.forRoot({
       load: [appConfigLoader],
       isGlobal: true,
-      cache: true
+      cache: true,
+      validate: (config) => {console.log(config); return {}}
     }),
     ApartmentModule,
     MongooseModule.forRootAsync({

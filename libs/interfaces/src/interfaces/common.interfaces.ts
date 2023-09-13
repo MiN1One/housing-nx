@@ -5,6 +5,8 @@ export enum EInstalments {
   WEEKLY = 'Weekly'
 }
 
+export const DEFAULT_INSTALMENT: InstalmentTypes = 'MONTHLY';
+
 export type InstalmentTypes = keyof typeof EInstalments;
 
 export interface IImage {
@@ -24,8 +26,11 @@ export enum EGenders {
 
 export enum ECurrencies {
   LOCAL = 'Local',
-  FOREIGN = 'Foreign'
+  FOREIGN = 'Foreign',
+  ANY = 'Any'
 }
+
+export const DEFAULT_CURRENCY_TYPE: CurrencyTypes = 'ANY';
 
 export interface IWithTimeStamp {
   updatedAt?: string;

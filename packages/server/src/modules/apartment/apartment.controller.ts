@@ -8,7 +8,7 @@ import {
   Get,
   Body,
 } from '@nestjs/common';
-import { APARTMENT_ROUTES, ApartmentDto } from '@MiN1One/interfaces';
+import { APARTMENT_ROUTES, IApartment } from '@MiN1One/interfaces';
 import { ApartmentService } from './apartment.service';
 
 @Controller(APARTMENT_ROUTES.ROOT)
@@ -28,7 +28,7 @@ export class ApartmentController {
   @Patch(APARTMENT_ROUTES.SINGLE_APARTMENT)
   updateApartment(
     @Param('apartmentId') apartmentId: string,
-    @Body('apartment') apartmentUpdate: ApartmentDto
+    @Body('apartment') apartmentUpdate: IApartment
   ) {
     return this.apartmentService.updateApartment(apartmentId, apartmentUpdate);
   }
@@ -39,7 +39,7 @@ export class ApartmentController {
   }
 
   @Post()
-  createApartment(@Body('apartment') apartment: ApartmentDto) {
+  createApartment(@Body('apartment') apartment: IApartment) {
     return this.apartmentService.createApartment(apartment);
   }
 }

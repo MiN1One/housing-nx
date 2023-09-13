@@ -1,7 +1,7 @@
 import { FactoryService } from '@MiN1One/api-factory';
 import { Injectable } from '@nestjs/common';
 import { ApartmentDocument } from './apartment.schema';
-import { ApartmentDto } from '@MiN1One/interfaces';
+import { IApartment } from '@MiN1One/interfaces';
 
 @Injectable()
 export class ApartmentService {
@@ -25,7 +25,7 @@ export class ApartmentService {
     return this.factoryService.updateDocument(apartmentId, update);
   }
 
-  createApartment(apartment: ApartmentDto) {
+  createApartment(apartment: IApartment) {
     return this.createApartment(apartment);
   }
 }

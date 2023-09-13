@@ -1,0 +1,162 @@
+import {
+  AcceptedForTypes,
+  AcceptedPaymentMethodTypes,
+  ApartmentConditionTypes,
+  ApartmentRoomTypes,
+  CurrencyTypes,
+  DEFAULT_ACCEPTED_PAYMENT_METHOD,
+  DEFAULT_CURRENCY_TYPE,
+  DEFAULT_INSTALMENT,
+  EAcceptedForTypes,
+  EAcceptedPaymentMethods,
+  EApartmentConditions,
+  EApartmentRooms,
+  ECurrencies,
+  EGenders,
+  EInstalments,
+  GenderTypes,
+  IApartment,
+  IApartmentAllocation,
+  IApartmentPrice,
+  IApartmentRooms,
+  IApartmentRule,
+  IBill,
+  IFacility,
+  IImage,
+  IUser,
+  InstalmentTypes,
+} from '@MiN1One/interfaces';
+import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
+import { SchemaTypes } from 'mongoose';
+import { Booking } from '../booking/booking.schema';
+import { Image } from '../../common/schema/image.schema';
+import { Bill } from './bill.schema';
+import { Facility } from './facility.schema';
+import { User } from '../user/user.schema';
+import { ApartmentRule } from './apartment-rule.schema';
+
+@Schema()
+class ApartmentRooms implements IApartmentRooms {
+  @Prop({ type: String })
+  numberOfRooms: number;
+
+  @Prop({ type: String, enum: Object.keys(EApartmentRooms) })
+  rooms: ApartmentRoomTypes;
+}
+
+@Schema()
+class ApartmentPrice implements IApartmentPrice {
+  @Prop({
+    type: String,
+    enum: Object.keys(EInstalments),
+    default: DEFAULT_INSTALMENT,
+  })
+  instalment: InstalmentTypes;
+
+  @Prop({ type: Number, required: true })
+  price: number;
+
+  @Prop({
+    type: String,
+    enum: Object.keys(ECurrencies),
+    default: DEFAULT_CURRENCY_TYPE,
+  })
+  currencyAccepted: CurrencyTypes;
+
+  @Prop({
+    type: String,
+    enum: Object.keys(EAcceptedPaymentMethods),
+    default: DEFAULT_ACCEPTED_PAYMENT_METHOD,
+  })
+  method: AcceptedPaymentMethodTypes;
+}
+
+@Schema()
+class ApartmentAllocation implements IApartmentAllocation {
+  @Prop({ type: String, enum: Object.keys(EGenders), required: true })
+  gender: GenderTypes;
+
+  @Prop({ type: Number, required: true })
+  maxPeople: number;
+
+  @Prop({ type: String, required: true, enum: Object.keys(EAcceptedForTypes) })
+  type: AcceptedForTypes;
+}
+
+@Schema({
+  timestamps: true,
+  toJSON: {
+    virtuals: true,
+  },
+})
+export class Apartment implements IApartment {
+  @Prop({ type: String, required: true })
+  title: string;
+
+  @Prop({ type: String })
+  handle: string;
+
+  @Prop([{ type: SchemaTypes.ObjectId, ref: Facility.name, required: true }])
+  facilities: IFacility[];
+
+  @Prop([{ type: SchemaTypes.ObjectId, ref: Bill.name, required: true }])
+  bills: IBill[];
+
+  @Prop({ type: ApartmentRooms, required: true })
+  rooms: IApartmentRooms;
+
+  @Prop({ type: String, required: true })
+  address: string;
+
+  @Prop({
+    type: String,
+    enum: Object.keys(EApartmentConditions),
+    required: true,
+  })
+  condition: ApartmentConditionTypes;
+
+  @Prop({ type: Boolean })
+  payment: any;
+
+  @Prop({ type: Number, default: 1 })
+  rating: number;
+
+  @Prop({ type: Boolean, default: false })
+  available: boolean;
+
+  @Prop([{ type: Image }])
+  images: IImage[];
+
+  @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
+  landlord: string | IUser;
+
+  @Prop({ type: ApartmentAllocation, required: true })
+  allocation: IApartmentAllocation;
+
+  @Prop([
+    { type: SchemaTypes.ObjectId, ref: ApartmentRule.name, required: true },
+  ])
+  rules: IApartmentRule[];
+
+  @Prop({ type: ApartmentPrice, required: true })
+  price: IApartmentPrice;
+}
+
+export const ApartmentSchema = SchemaFactory.createForClass(Apartment);
+
+ApartmentSchema.virtual('reviews', {
+  localField: '_id',
+  foreignField: 'apartment',
+  ref: Apartment.name,
+  options: {
+    populate: 'reviewer',
+  },
+});
+
+ApartmentSchema.virtual('bookings', {
+  localField: '_id',
+  foreignField: 'apartment',
+  ref: Booking.name,
+});
+
+export type ApartmentDocument = Apartment & Document;

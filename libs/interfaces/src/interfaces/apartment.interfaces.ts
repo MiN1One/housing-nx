@@ -11,19 +11,19 @@ export interface IFacility extends IWithHandle {
 export interface IBill extends IWithHandle {
   description: string;
   icon: string;
-}
+};
 
 export interface IApartmentRule extends IWithHandle {
   description: string;
   icon: string;
 }
 
-export enum EAcceptedTypes {
+export enum EAcceptedForTypes {
   STUDENTS = 'Students',
   FAMILY = 'Family'
 }
 
-export type AcceptedTypes = keyof typeof EAcceptedTypes;
+export type AcceptedForTypes = keyof typeof EAcceptedForTypes;
 
 export enum EAcceptedPaymentMethods {
   CASH = 'Cash',
@@ -31,12 +31,33 @@ export enum EAcceptedPaymentMethods {
   ANY = 'Any'
 }
 
+export const DEFAULT_ACCEPTED_PAYMENT_METHOD: AcceptedPaymentMethodTypes = 'ANY';
+
 export type AcceptedPaymentMethodTypes = keyof typeof EAcceptedPaymentMethods;
+
+export enum EApartmentRooms {
+  KITCHEN = 'Kitchen',
+  LIVING_ROOM = 'Living room',
+  DINING_ROOM = 'Dining room',
+  BALCONY = 'Balcony',
+  BEDROOM = 'Bedroom',
+  BATHROOM = 'Bathroom'
+}
+
+export enum EApartmentConditions {
+  NORMAL = 'Normal',
+  OKAY = 'Okay',
+  LUXE = 'Luxe'
+}
+
+export type ApartmentConditionTypes = keyof typeof EApartmentConditions;
+
+export type ApartmentRoomTypes = keyof typeof EApartmentRooms;
 
 export interface IApartmentAllocation {
   gender: GenderTypes;
   maxPeople: number;
-  type: AcceptedTypes;
+  type: AcceptedForTypes;
 }
 
 export interface IApartmentPrice {
@@ -46,20 +67,25 @@ export interface IApartmentPrice {
   method: AcceptedPaymentMethodTypes;
 }
 
-export interface IApartment extends IWithTimeStamp, IWithHandle {
+export interface IApartmentRooms {
+  rooms: ApartmentRoomTypes;
   numberOfRooms: number;
+}
+
+export interface IApartment extends IWithTimeStamp, IWithHandle {
+  rooms: IApartmentRooms;
   facilities: IFacility[];
   bills: IBill[];
   address: string;
-  condition: 'OKAY' | 'NORMAL' | 'LUXE';
+  condition: ApartmentConditionTypes;
   payment: any;
   allocation: IApartmentAllocation;
   price: IApartmentPrice;
   images: IImage[];
   available: boolean;
   landlord: IUser | string;
-  bookings: IBooking[] | string[];
+  bookings?: IBooking[] | string[];
   rules: IApartmentRule[];
-  reviews: IReview[] | string[];
+  reviews?: IReview[] | string[];
   rating: number;
 }

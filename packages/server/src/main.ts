@@ -3,9 +3,12 @@
  * This is only a minimal backend to get started.
  */
 
-import { Logger } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
-import { FastifyAdapter, NestFastifyApplication } from '@nestjs/platform-fastify';
+import {
+  FastifyAdapter,
+  NestFastifyApplication,
+} from '@nestjs/platform-fastify';
 import { API_BASE } from '@MiN1One/interfaces';
 
 import { AppModule } from './modules/app/app.module';
@@ -19,7 +22,11 @@ async function bootstrap() {
   );
 
   app.setGlobalPrefix(API_BASE);
-  const configModules = app.get<ConfigType<typeof appConfigLoader>>(appConfigLoader.KEY);
+  const configModules = app.get<ConfigType<typeof appConfigLoader>>(
+    appConfigLoader.KEY
+  );
+
+  app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
   const port = configModules.appPort ?? 3000;
 

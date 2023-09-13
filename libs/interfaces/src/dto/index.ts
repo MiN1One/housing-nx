@@ -1,1 +1,1 @@
-export * from './apartment/apartment.dto';
+export {}
