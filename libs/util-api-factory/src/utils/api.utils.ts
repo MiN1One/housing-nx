@@ -1,4 +1,6 @@
 import { Query } from "mongoose";
+import { BadRequestException, InternalServerErrorException } from "@nestjs/common";
+import { Error } from "mongoose";
 
 export const DEFAULT_LIMIT_COUNT = 10;
 
@@ -90,3 +92,12 @@ export class ApiFeatures<DocumentType> {
     return this;
   }
 }
+
+export const throwApiException = (er: unknown) => {
+  if (er instanceof Error.ValidationError) {
+    const errorPaths = Object.keys(er);
+    console.log({errorPaths});
+    throw new BadRequestException('Validation Error');
+  }
+  throw new InternalServerErrorException('Something went wrong!');
+};

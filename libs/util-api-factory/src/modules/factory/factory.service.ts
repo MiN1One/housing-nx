@@ -1,6 +1,6 @@
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { HydratedDocument, Model, Types, UpdateQuery } from 'mongoose';
-import { ApiFeatures } from '../../utils/api.utils';
+import { ApiFeatures, throwApiException } from '../../utils/api.utils';
 import {
   FactoryModuleOptions,
   FACTORY_MODULE_TOKEN,
@@ -19,21 +19,25 @@ export class FactoryService<D = any> {
     this.modelName = this.model.collection.name;
   }
 
+  throwError(error: unknown, context: keyof FactoryService) {
+    Logger.error(error, `FactoryService:${context}:${this.modelName}`);
+    throwApiException(error);
+  }
+
   async getDocumentsByIds<T = Array<D>>(...ids: string[]) {
     try {
       const objectIds = ids.map((id) => new Types.ObjectId(id));
       const documents = await this.model.find({ _id: { $in: objectIds } });
       return documents as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:getDocumentsByIds:${this.modelName}`);
-      return [] as T;
+      this.throwError(er, 'getDocumentsByIds');
     }
   }
 
   async getAllDocuments<T = Array<D>>(
     query: Record<string, any>,
     ...populate: string[]
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       let { mongooseQuery } = new ApiFeatures(this.model.find(), query)
         .limit()
@@ -51,15 +55,14 @@ export class FactoryService<D = any> {
       const documents = await mongooseQuery;
       return documents as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:getAllDocuments:${this.modelName}`);
-      return [] as T;
+      this.throwError(er, 'getAllDocuments');
     }
   }
 
   async getDocument<T = D>(
     documentId: string,
     ...populate: string[]
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       let query = this.model.findById(documentId);
       if (populate.length) {
@@ -71,15 +74,14 @@ export class FactoryService<D = any> {
       }
       return document as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:getDocument:${this.modelName}`);
-      return {} as T;
+      this.throwError(er, 'getDocument');
     }
   }
 
   async updateDocument<T = D>(
     documentId: string,
     update: UpdateQuery<T>
-  ): Promise<T> {
+  ): Promise<T | undefined> {
     try {
       const updatedDocument = await this.model.findByIdAndUpdate(
         documentId,
@@ -88,31 +90,29 @@ export class FactoryService<D = any> {
       );
       return updatedDocument as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:updateDocument:${this.modelName}`);
-      return {} as T;
+      this.throwError(er, 'updateDocument');
     }
   }
 
-  async deleteDocument(documentId: string): Promise<null> {
+  async deleteDocument(documentId: string): Promise<null | undefined> {
     try {
       const deletedDocument = await this.model.findByIdAndDelete(documentId);
       if (!deletedDocument) {
         throw new NotFoundException('Document with this id is not found');
       }
+      return null;
     } catch (er) {
-      Logger.error(er, `FactoryService:deleteDocument:${this.modelName}`);
+      this.throwError(er, 'deleteDocument');
     }
-    return null;
   }
 
-  async createDocument<T = D>(document: T): Promise<T> {
+  async createDocument<T = D>(document: T): Promise<T | undefined> {
     try {
       const createdDocument = await this.model.create(document);
       await createdDocument.save();
       return createdDocument as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:createDocument:${this.modelName}`);
-      return {} as T;
+      this.throwError(er, 'createDocument');
     }
   }
 }

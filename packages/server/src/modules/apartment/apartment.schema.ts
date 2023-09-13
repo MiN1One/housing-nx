@@ -79,7 +79,7 @@ class ApartmentAllocation implements IApartmentAllocation {
   maxPeople: number;
 
   @Prop({ type: String, required: true, enum: Object.keys(EAcceptedForTypes) })
-  type: AcceptedForTypes;
+  status: AcceptedForTypes;
 }
 
 @Schema({
@@ -130,7 +130,7 @@ export class Apartment implements IApartment {
   @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
   landlord: string | IUser;
 
-  @Prop({ type: ApartmentAllocation })
+  @Prop({ type: ApartmentAllocation, required: true })
   allocation: IApartmentAllocation;
 
   @Prop([

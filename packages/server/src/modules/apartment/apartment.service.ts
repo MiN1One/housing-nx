@@ -26,6 +26,6 @@ export class ApartmentService {
   }
 
   createApartment(apartment: IApartment) {
-    return this.createApartment(apartment);
+    return this.factoryService.createDocument(apartment);
   }
 }

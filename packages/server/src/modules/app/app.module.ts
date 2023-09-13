@@ -21,7 +21,7 @@ import { UserModule } from '../user/user.module';
       useFactory: ({ dbUrl }: ConfigType<typeof appConfigLoader>) => ({ 
         uri: dbUrl,
         retryDelay: 5000,
-        retryAttempts: 5
+        retryAttempts: 5,
       }),
       inject: [appConfigLoader.KEY]
     }),

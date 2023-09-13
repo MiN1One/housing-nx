@@ -35,7 +35,7 @@ export class User implements IUser {
   rating: number;
 
   @Prop({ type: String, enum: Object.keys(EUserTypes), default: DEFAULT_USER })
-  type: UserTypes;
+  role: UserTypes;
 
   @Prop([{ type: SchemaTypes.ObjectId, ref: 'Review' }])
   reviews: IReview[] | string[];

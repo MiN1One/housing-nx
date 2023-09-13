@@ -26,7 +26,7 @@ export interface IUser extends IWithTimeStamp {
   maritalStatus: MaritalStatusTypes;
   phoneNumber: string;
   email: string | null;
-  type: UserTypes;
+  role: UserTypes;
   reviews: IReview[] | string[];
   rating: number;
 }

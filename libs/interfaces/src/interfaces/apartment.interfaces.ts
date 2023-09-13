@@ -57,7 +57,7 @@ export type ApartmentRoomTypes = keyof typeof EApartmentRooms;
 export interface IApartmentAllocation {
   gender: GenderTypes;
   maxPeople: number;
-  type: AcceptedForTypes;
+  status: AcceptedForTypes;
 }
 
 export interface IApartmentPrice {
