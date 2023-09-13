@@ -1,3 +1,4 @@
+export * from './app.interface';
 export * from './apartment.interfaces';
 export * from './common.interfaces';
 export * from './user.interfaces';

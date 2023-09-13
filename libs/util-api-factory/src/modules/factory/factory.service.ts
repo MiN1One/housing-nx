@@ -5,10 +5,12 @@ import {
   FactoryModuleOptions,
   FACTORY_MODULE_TOKEN,
 } from './factory.module-definition';
+import { IAppConfig } from '@MiN1One/interfaces';
 
 @Injectable()
 export class FactoryService<D = any> {
   model: Model<HydratedDocument<any>>;
+  appConfig: IAppConfig;
   modelName: string;
 
   constructor(
@@ -16,12 +18,14 @@ export class FactoryService<D = any> {
     factoryModuleOptions: FactoryModuleOptions
   ) {
     this.model = factoryModuleOptions.model;
+    this.appConfig = factoryModuleOptions.appConfig;
+    console.log({ap: this.appConfig})
     this.modelName = this.model.collection.name;
   }
 
   throwError(error: unknown, context: keyof FactoryService) {
     Logger.error(error, `FactoryService:${context}:${this.modelName}`);
-    throwApiException(error);
+    throwApiException(error, this.appConfig);
   }
 
   async getDocumentsByIds<T = Array<D>>(...ids: string[]) {

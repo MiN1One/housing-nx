@@ -1,6 +1,9 @@
-import { Query } from "mongoose";
-import { BadRequestException, InternalServerErrorException } from "@nestjs/common";
-import { Error } from "mongoose";
+import { Query } from 'mongoose';
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { Error } from 'mongoose';
 
 export const DEFAULT_LIMIT_COUNT = 10;
 
@@ -10,8 +13,8 @@ export const API_QUERY_KEYS = [
   'limit',
   'search',
   'sort',
-  'populate'
-]; 
+  'populate',
+];
 
 export class ApiFeatures<DocumentType> {
   constructor(
@@ -29,7 +32,7 @@ export class ApiFeatures<DocumentType> {
 
   filter() {
     const queriesCopy = Object.assign({}, this.requestQuery);
-    API_QUERY_KEYS.forEach(key => delete queriesCopy[key]);
+    API_QUERY_KEYS.forEach((key) => delete queriesCopy[key]);
 
     this.mongooseQuery = this.mongooseQuery.find(queriesCopy);
 
@@ -62,8 +65,8 @@ export class ApiFeatures<DocumentType> {
         $text: {
           $search: this.requestQuery.search,
           $caseSensitive: false,
-          $diacriticSensitive: false
-        }
+          $diacriticSensitive: false,
+        },
       });
     }
     return this;
@@ -71,7 +74,7 @@ export class ApiFeatures<DocumentType> {
 
   limit() {
     this.mongooseQuery = this.mongooseQuery.limit(
-      this.requestQuery.limit 
+      this.requestQuery.limit
         ? parseInt(this.requestQuery.limit)
         : DEFAULT_LIMIT_COUNT
     );
@@ -83,7 +86,7 @@ export class ApiFeatures<DocumentType> {
       const limit = this.requestQuery.limit
         ? parseInt(this.requestQuery.limit, 10)
         : DEFAULT_LIMIT_COUNT;
-        
+
       const page = parseInt(this.requestQuery.page, 10);
       const skip = page - 1 * limit;
 
@@ -93,11 +96,15 @@ export class ApiFeatures<DocumentType> {
   }
 }
 
-export const throwApiException = (er: unknown) => {
-  if (er instanceof Error.ValidationError) {
-    const errorPaths = Object.keys(er);
-    console.log({errorPaths});
-    throw new BadRequestException('Validation Error');
+export const throwApiException = (error: unknown, env: Record<string, any>) => {
+  if (env.isDevelopment) {
+    if (error instanceof Error.ValidationError) {
+      const errorPaths = Object.keys(error);
+      console.log({ errorPaths });
+      throw new BadRequestException('Validation Error');
+    }
   }
-  throw new InternalServerErrorException('Something went wrong!');
+  throw new InternalServerErrorException(
+    env.isDevelopment ? JSON.stringify(error) : 'Something went wrong!'
+  );
 };
