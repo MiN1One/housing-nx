@@ -28,7 +28,6 @@ import {
 } from '@MiN1One/interfaces';
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
 import { SchemaTypes } from 'mongoose';
-import { Booking } from '../booking/booking.schema';
 import { Image } from '../../common/schema/image.schema';
 import { Bill } from './bill.schema';
 import { Facility } from './facility.schema';
@@ -88,6 +87,7 @@ class ApartmentAllocation implements IApartmentAllocation {
   toJSON: {
     virtuals: true,
   },
+  virtuals: true,
 })
 export class Apartment implements IApartment {
   @Prop({ type: String, required: true })
@@ -130,7 +130,7 @@ export class Apartment implements IApartment {
   @Prop({ type: SchemaTypes.ObjectId, ref: User.name, required: true })
   landlord: string | IUser;
 
-  @Prop({ type: ApartmentAllocation, required: true })
+  @Prop({ type: ApartmentAllocation })
   allocation: IApartmentAllocation;
 
   @Prop([
@@ -143,11 +143,12 @@ export class Apartment implements IApartment {
 }
 
 export const ApartmentSchema = SchemaFactory.createForClass(Apartment);
+export type ApartmentDocument = Apartment & Document;
 
 ApartmentSchema.virtual('reviews', {
   localField: '_id',
   foreignField: 'apartment',
-  ref: Apartment.name,
+  ref: 'Review',
   options: {
     populate: 'reviewer',
   },
@@ -156,7 +157,5 @@ ApartmentSchema.virtual('reviews', {
 ApartmentSchema.virtual('bookings', {
   localField: '_id',
   foreignField: 'apartment',
-  ref: Booking.name,
+  ref: 'Booking',
 });
-
-export type ApartmentDocument = Apartment & Document;

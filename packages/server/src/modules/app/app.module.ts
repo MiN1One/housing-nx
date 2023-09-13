@@ -5,6 +5,9 @@ import { ConfigModule, ConfigType } from '@nestjs/config';
 import { appConfigLoader } from './app.config';
 import { ApartmentModule } from '../apartment/apartment.module';
 import { MongooseModule } from '@nestjs/mongoose';
+import { BookingModule } from '../booking/booking.module';
+import { ReviewModule } from '../review/review.module';
+import { UserModule } from '../user/user.module';
 
 @Module({
   imports: [
@@ -12,7 +15,6 @@ import { MongooseModule } from '@nestjs/mongoose';
       load: [appConfigLoader],
       isGlobal: true,
       cache: true,
-      validate: (config) => {console.log(config); return {}}
     }),
     ApartmentModule,
     MongooseModule.forRootAsync({
@@ -23,6 +25,9 @@ import { MongooseModule } from '@nestjs/mongoose';
       }),
       inject: [appConfigLoader.KEY]
     }),
+    BookingModule,
+    ReviewModule,
+    UserModule,
   ],
   providers: [AppService],
 })

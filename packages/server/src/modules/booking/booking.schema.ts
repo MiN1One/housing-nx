@@ -1,7 +1,6 @@
 import { IApartment, IBooking, IUser } from "@MiN1One/interfaces";
 import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
 import { SchemaTypes } from 'mongoose';
-import { Apartment } from "../apartment/apartment.schema";
 
 @Schema({
   toJSON: { virtuals: true },
@@ -14,7 +13,7 @@ export class Booking implements IBooking {
   @Prop({ type: String })
   requestMessage: string;
 
-  @Prop({ type: SchemaTypes.ObjectId, ref: Apartment.name })
+  @Prop({ type: SchemaTypes.ObjectId, ref: 'Apartment' })
   apartment: string | IApartment;
 
   @Prop({ type: String })

@@ -9,11 +9,11 @@ import {
 import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { IReview } from 'libs/interfaces/src/interfaces/review.interfaces';
 import { SchemaTypes } from 'mongoose';
-import { Review } from '../review/review.schema';
 
 @Schema({
   toJSON: { virtuals: true },
   timestamps: true,
+  virtuals: true,
 })
 export class User implements IUser {
   @Prop({ type: String, required: true })
@@ -37,7 +37,7 @@ export class User implements IUser {
   @Prop({ type: String, enum: Object.keys(EUserTypes), default: DEFAULT_USER })
   type: UserTypes;
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: Review.name }])
+  @Prop([{ type: SchemaTypes.ObjectId, ref: 'Review' }])
   reviews: IReview[] | string[];
 }
 
