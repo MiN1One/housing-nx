@@ -19,7 +19,6 @@ export class FactoryService<D = any> {
   ) {
     this.model = factoryModuleOptions.model;
     this.appConfig = factoryModuleOptions.appConfig;
-    console.log({ap: this.appConfig})
     this.modelName = this.model.collection.name;
   }
 

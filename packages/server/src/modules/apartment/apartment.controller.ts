@@ -16,7 +16,7 @@ export class ApartmentController {
   constructor(readonly apartmentService: ApartmentService) {}
 
   @Get()
-  getAllApartments(@Query() query: Record<string, any>) {
+  getAllApartments(@Query() query: Record<string, any> = {}) {
     return this.apartmentService.getAllApartments(query);
   }
 

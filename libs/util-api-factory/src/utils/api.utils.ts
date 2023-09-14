@@ -99,9 +99,11 @@ export class ApiFeatures<DocumentType> {
 export const throwApiException = (error: unknown, env: Record<string, any>) => {
   if (env.isDevelopment) {
     if (error instanceof Error.ValidationError) {
-      const errorPaths = Object.keys(error);
-      console.log({ errorPaths });
-      throw new BadRequestException('Validation Error');
+      const errorPaths = Object.keys(error.errors);
+      const errorMappedMessages = errorPaths.map(
+        (key) => error.errors[key].message.replace('.', '')
+      );
+      throw new BadRequestException(errorMappedMessages.join('; '));
     }
   }
   throw new InternalServerErrorException(

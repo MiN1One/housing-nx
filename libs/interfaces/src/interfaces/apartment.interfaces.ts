@@ -3,12 +3,12 @@ import { CurrencyTypes, GenderTypes, IImage, IWithHandle, IWithTimeStamp, Instal
 import { IReview } from "./review.interfaces";
 import { IUser } from "./user.interfaces";
 
-export interface IFacility extends IWithHandle {
+export interface IApartmentFacility extends IWithHandle {
   description: string;
   icon: string;
 }
 
-export interface IBill extends IWithHandle {
+export interface IApartmentUtility extends IWithHandle {
   description: string;
   icon: string;
 };
@@ -74,8 +74,8 @@ export interface IApartmentRooms {
 
 export interface IApartment extends IWithTimeStamp, IWithHandle {
   rooms: IApartmentRooms;
-  facilities: IFacility[];
-  bills: IBill[];
+  facilities: IApartmentFacility[];
+  bills: IApartmentUtility[];
   address: string;
   condition: ApartmentConditionTypes;
   payment: any;

@@ -20,8 +20,8 @@ import {
   IApartmentPrice,
   IApartmentRooms,
   IApartmentRule,
-  IBill,
-  IFacility,
+  IApartmentUtility,
+  IApartmentFacility,
   IImage,
   IUser,
   InstalmentTypes,
@@ -29,10 +29,10 @@ import {
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
 import { SchemaTypes } from 'mongoose';
 import { Image } from '../../common/schema/image.schema';
-import { Bill } from './bill.schema';
-import { Facility } from './facility.schema';
+import { ApartmentFacility } from '../apartment-facility/apartment-facility.schema';
 import { User } from '../user/user.schema';
-import { ApartmentRule } from './apartment-rule.schema';
+import { ApartmentUtility } from '../apartment-utility/apartment-utility.schema';
+import { ApartmentRule } from '../apartment-rule/apartment-rule.schema';
 
 @Schema()
 class ApartmentRooms implements IApartmentRooms {
@@ -96,11 +96,11 @@ export class Apartment implements IApartment {
   @Prop({ type: String })
   handle: string;
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: Facility.name, required: true }])
-  facilities: IFacility[];
+  @Prop([{ type: SchemaTypes.ObjectId, ref: ApartmentFacility.name, required: true }])
+  facilities: IApartmentFacility[];
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: Bill.name, required: true }])
-  bills: IBill[];
+  @Prop([{ type: SchemaTypes.ObjectId, ref: ApartmentUtility.name, required: true }])
+  bills: IApartmentUtility[];
 
   @Prop({ type: ApartmentRooms, required: true })
   rooms: IApartmentRooms;

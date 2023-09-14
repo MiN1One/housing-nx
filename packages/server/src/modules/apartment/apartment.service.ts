@@ -6,7 +6,7 @@ import { IApartment } from '@MiN1One/interfaces';
 @Injectable()
 export class ApartmentService {
   constructor(
-    private readonly factoryService: FactoryService<ApartmentDocument>
+    private readonly factoryService: FactoryService<ApartmentDocument>,
   ) {}
 
   getAllApartments(query: Record<string, any>) {
