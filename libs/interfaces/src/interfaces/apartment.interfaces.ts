@@ -19,8 +19,9 @@ export interface IApartmentRule extends IWithTitle {
 }
 
 export enum EAcceptedForTypes {
-  STUDENTS = 'Students',
-  FAMILY = 'Family'
+  ONLY_FAMILY = 'With Family Only',
+  ONLY_MALE = 'Only Men',
+  ONLY_FEMALE = 'Only Female'
 }
 
 export type AcceptedForTypes = keyof typeof EAcceptedForTypes;
@@ -55,7 +56,6 @@ export type ApartmentConditionTypes = keyof typeof EApartmentConditions;
 export type ApartmentRoomTypes = keyof typeof EApartmentRooms;
 
 export interface IApartmentAllocation {
-  gender: GenderTypes;
   maxPeople: number;
   status: AcceptedForTypes;
 }

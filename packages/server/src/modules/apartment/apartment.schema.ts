@@ -12,37 +12,33 @@ import {
   EApartmentConditions,
   EApartmentRooms,
   ECurrencies,
-  EGenders,
   EInstalments,
-  GenderTypes,
   IApartment,
   IApartmentAllocation,
+  IApartmentFacility,
   IApartmentPrice,
   IApartmentRooms,
   IApartmentRule,
   IApartmentUtility,
-  IApartmentFacility,
   IImage,
   IUser,
   InstalmentTypes,
-  LocaleStringSchema,
 } from '@MiN1One/interfaces';
-import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
 import { SchemaTypes } from 'mongoose';
+import slugify from 'slugify';
 import { Image } from '../../common/schema/image.schema';
 import { ApartmentFacility } from '../apartment-facility/apartment-facility.schema';
-import { User } from '../user/user.schema';
-import { ApartmentUtility } from '../apartment-utility/apartment-utility.schema';
 import { ApartmentRule } from '../apartment-rule/apartment-rule.schema';
-import { IWithLocale } from 'libs/interfaces/src/interfaces/locale.interface';
-import slugify from 'slugify';
+import { ApartmentUtility } from '../apartment-utility/apartment-utility.schema';
+import { User } from '../user/user.schema';
 
 @Schema()
 class ApartmentRooms implements IApartmentRooms {
-  @Prop({ type: String })
+  @Prop({ type: Number })
   numberOfRooms: number;
 
-  @Prop({ type: String, enum: Object.keys(EApartmentRooms) })
+  @Prop([{ type: String, enum: Object.keys(EApartmentRooms), required: true }])
   rooms: ApartmentRoomTypes;
 }
 
@@ -75,9 +71,6 @@ class ApartmentPrice implements IApartmentPrice {
 
 @Schema()
 class ApartmentAllocation implements IApartmentAllocation {
-  @Prop({ type: String, enum: Object.keys(EGenders), required: true })
-  gender: GenderTypes;
-
   @Prop({ type: Number, required: true })
   maxPeople: number;
 
@@ -154,6 +147,7 @@ export type ApartmentDocument = Apartment & Document;
 
 ApartmentSchema.pre('save', function (next) {
   this.handle = slugify(this.title);
+  this.rooms.numberOfRooms = this.rooms.rooms.length;
   next();
 });
 
