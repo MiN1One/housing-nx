@@ -1,19 +1,19 @@
 import { IBooking } from "./booking.interfaces";
-import { CurrencyTypes, GenderTypes, IImage, IWithHandle, IWithTimeStamp, InstalmentTypes } from "./common.interfaces";
+import { CurrencyTypes, GenderTypes, IImage, IWithTitle, IWithTimeStamp, InstalmentTypes } from "./common.interfaces";
 import { IReview } from "./review.interfaces";
 import { IUser } from "./user.interfaces";
 
-export interface IApartmentFacility extends IWithHandle {
+export interface IApartmentFacility extends IWithTitle {
   description: string;
   icon: string;
 }
 
-export interface IApartmentUtility extends IWithHandle {
+export interface IApartmentUtility extends IWithTitle {
   description: string;
   icon: string;
 };
 
-export interface IApartmentRule extends IWithHandle {
+export interface IApartmentRule extends IWithTitle {
   description: string;
   icon: string;
 }
@@ -72,7 +72,9 @@ export interface IApartmentRooms {
   numberOfRooms: number;
 }
 
-export interface IApartment extends IWithTimeStamp, IWithHandle {
+export interface IApartment extends IWithTimeStamp {
+  title: string;
+  handle: string;
   rooms: IApartmentRooms;
   facilities: IApartmentFacility[];
   bills: IApartmentUtility[];

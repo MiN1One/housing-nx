@@ -1,10 +1,10 @@
-import { IWithHandle } from "./common.interfaces";
+import { IWithTitle } from "./common.interfaces";
 
-export interface IUniversity extends IWithHandle {
+export interface IUniversity extends IWithTitle {
   location: string;
   distance: string;
 }
 
-export interface INearbyPlace extends IWithHandle {
+export interface INearbyPlace extends IWithTitle {
   distance: string; 
 }

@@ -1,3 +1,5 @@
+import { IWithLocale } from "./locale.interface";
+
 export enum EInstalments {
   MONTHLY = 'Monthly',
   YEARLY = 'Yearly',
@@ -14,8 +16,8 @@ export interface IImage {
   src: string;
 }
 
-export interface IWithHandle {
-  title: string;
+export interface IWithTitle {
+  title: IWithLocale;
   handle: string;
 }
 
