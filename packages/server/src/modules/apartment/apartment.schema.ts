@@ -25,6 +25,7 @@ import {
   IImage,
   IUser,
   InstalmentTypes,
+  LocaleStringSchema,
 } from '@MiN1One/interfaces';
 import { SchemaFactory, Schema, Prop } from '@nestjs/mongoose';
 import { SchemaTypes } from 'mongoose';
@@ -33,6 +34,8 @@ import { ApartmentFacility } from '../apartment-facility/apartment-facility.sche
 import { User } from '../user/user.schema';
 import { ApartmentUtility } from '../apartment-utility/apartment-utility.schema';
 import { ApartmentRule } from '../apartment-rule/apartment-rule.schema';
+import { IWithLocale } from 'libs/interfaces/src/interfaces/locale.interface';
+import slugify from 'slugify';
 
 @Schema()
 class ApartmentRooms implements IApartmentRooms {
@@ -96,10 +99,14 @@ export class Apartment implements IApartment {
   @Prop({ type: String })
   handle: string;
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: ApartmentFacility.name, required: true }])
+  @Prop([
+    { type: SchemaTypes.ObjectId, ref: ApartmentFacility.name, required: true },
+  ])
   facilities: IApartmentFacility[];
 
-  @Prop([{ type: SchemaTypes.ObjectId, ref: ApartmentUtility.name, required: true }])
+  @Prop([
+    { type: SchemaTypes.ObjectId, ref: ApartmentUtility.name, required: true },
+  ])
   bills: IApartmentUtility[];
 
   @Prop({ type: ApartmentRooms, required: true })
@@ -144,6 +151,11 @@ export class Apartment implements IApartment {
 
 export const ApartmentSchema = SchemaFactory.createForClass(Apartment);
 export type ApartmentDocument = Apartment & Document;
+
+ApartmentSchema.pre('save', function (next) {
+  this.handle = slugify(this.title);
+  next();
+});
 
 ApartmentSchema.virtual('reviews', {
   localField: '_id',
