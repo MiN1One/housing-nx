@@ -6,5 +6,6 @@ export const appConfigLoader = registerAs<IAppConfig>('appConfig', () => ({
   appPort: +process.env.PORT,
   jwtKey: process.env.JWT_KEY,
   jwtExpiresIn: process.env.JWT_EXPIRES_IN,
-  isDevelopment: process.env.NODE_ENV === 'development'
-})); 
+  cookieSecret: process.env.COOKIE_SECRET,
+  isDevelopment: process.env.NODE_ENV === 'development',
+}));

@@ -1,19 +1,15 @@
-/**
- * This is not a production server yet!
- * This is only a minimal backend to get started.
- */
-
+import { API_BASE } from '@MiN1One/interfaces';
 import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import {
   FastifyAdapter,
   NestFastifyApplication,
 } from '@nestjs/platform-fastify';
-import { API_BASE } from '@MiN1One/interfaces';
 
-import { AppModule } from './modules/app/app.module';
-import { appConfigLoader } from './modules/app/app.config';
+import fastifyCookie from '@fastify/cookie';
 import { ConfigType } from '@nestjs/config';
+import { appConfigLoader } from './modules/app/app.config';
+import { AppModule } from './modules/app/app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestFastifyApplication>(
@@ -21,14 +17,20 @@ async function bootstrap() {
     new FastifyAdapter()
   );
 
-  app.setGlobalPrefix(API_BASE);
-  const configModules = app.get<ConfigType<typeof appConfigLoader>>(
+  const appConfig = app.get<ConfigType<typeof appConfigLoader>>(
     appConfigLoader.KEY
   );
 
+  app.setGlobalPrefix(API_BASE);
+
+  // @ts-ignore
+  await app.register(fastifyCookie, {
+    secret: appConfig.cookieSecret,
+  });
+
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
 
-  const port = configModules.appPort ?? 3000;
+  const port = appConfig.appPort ?? 3000;
 
   await app.listen(port);
 

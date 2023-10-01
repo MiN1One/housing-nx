@@ -1,13 +1,12 @@
-import { Injectable } from "@nestjs/common";
-import { UserDocument } from "./user.schema";
-import { FactoryService } from "@MiN1One/api-factory";
-import { IUser } from "@MiN1One/interfaces";
+import { Injectable } from '@nestjs/common';
+import { UserDocument } from './user.schema';
+import { FactoryService } from '@MiN1One/api-factory';
+import { IUser } from '@MiN1One/interfaces';
+import { FilterQuery } from 'mongoose';
 
 @Injectable()
 export class UserService {
-  constructor(
-    private readonly factoryService: FactoryService<UserDocument>
-  ) {}
+  constructor(private readonly factoryService: FactoryService<UserDocument>) {}
 
   getAllUsers(query: Record<string, any>) {
     return this.factoryService.getAllDocuments(query);
@@ -25,7 +24,16 @@ export class UserService {
     return this.factoryService.updateDocument(userId, update);
   }
 
-  createUser(user: IUser) {
+  createUser(user: Partial<IUser>) {
     return this.factoryService.createDocument(user);
+  }
+
+  getSingleUserByQuery(
+    query: FilterQuery<UserDocument>,
+    select: keyof UserDocument
+  ) {
+    return this.factoryService.getSingleDocumentByQuery(query, {
+      select,
+    });
   }
 }

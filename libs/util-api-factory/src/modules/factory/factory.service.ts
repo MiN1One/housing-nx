@@ -1,11 +1,22 @@
+import { IAppConfig } from '@MiN1One/interfaces';
 import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
-import { HydratedDocument, Model, Types, UpdateQuery } from 'mongoose';
+import {
+  FilterQuery,
+  HydratedDocument,
+  Model,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
 import { ApiFeatures, throwApiException } from '../../utils/api.utils';
 import {
-  FactoryModuleOptions,
   FACTORY_MODULE_TOKEN,
+  FactoryModuleOptions,
 } from './factory.module-definition';
-import { IAppConfig } from '@MiN1One/interfaces';
+
+interface ISingleDocumentOptions<T> {
+  select?: keyof T;
+  populate?: string[];
+}
 
 @Injectable()
 export class FactoryService<D = any> {
@@ -37,10 +48,28 @@ export class FactoryService<D = any> {
     }
   }
 
+  async getSingleDocumentByQuery<T = D>(
+    query: FilterQuery<T>,
+    { select, populate }: ISingleDocumentOptions<T>
+  ) {
+    try {
+      let mongoQuery = this.model.findOne(query);
+      if (select) {
+        mongoQuery = mongoQuery.select(select as string);
+      }
+      if (populate?.length) {
+        mongoQuery = mongoQuery.populate(populate);
+      }
+      return await mongoQuery.exec();
+    } catch (er) {
+      this.throwError(er, 'getSingleDocumentByQuery');
+    }
+  }
+
   async getAllDocuments<T = Array<D>>(
-    query: Record<string, any>,
+    query: FilterQuery<T>,
     ...populate: string[]
-  ): Promise<T | undefined> {
+  ): Promise<T[] | undefined> {
     try {
       let { mongooseQuery } = new ApiFeatures(this.model.find(), query)
         .limit()
@@ -56,7 +85,7 @@ export class FactoryService<D = any> {
       }
 
       const documents = await mongooseQuery;
-      return documents as T;
+      return documents as T[];
     } catch (er) {
       this.throwError(er, 'getAllDocuments');
     }
@@ -109,7 +138,7 @@ export class FactoryService<D = any> {
     }
   }
 
-  async createDocument<T = D>(document: T): Promise<T | undefined> {
+  async createDocument<T = D>(document: Partial<T>): Promise<T | undefined> {
     try {
       const createdDocument = await this.model.create(document);
       await createdDocument.save();

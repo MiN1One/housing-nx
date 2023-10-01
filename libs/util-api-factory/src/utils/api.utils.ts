@@ -1,9 +1,8 @@
-import { Query } from 'mongoose';
 import {
   BadRequestException,
   InternalServerErrorException,
 } from '@nestjs/common';
-import { Error } from 'mongoose';
+import { Error, Query } from 'mongoose';
 
 export const DEFAULT_LIMIT_COUNT = 10;
 
@@ -51,7 +50,11 @@ export class ApiFeatures<DocumentType> {
 
   project() {
     if (this.requestQuery.project) {
-      const fields = this.requestQuery.project.split(',').join(' ');
+      const fields = this.requestQuery.project
+        .split(',')
+        .filter((field) => field !== 'password')
+        .join(' ');
+
       this.mongooseQuery = this.mongooseQuery.select(fields);
     } else {
       this.mongooseQuery = this.mongooseQuery.select('-__v -__t');
@@ -100,8 +103,8 @@ export const throwApiException = (error: unknown, env: Record<string, any>) => {
   if (env.isDevelopment) {
     if (error instanceof Error.ValidationError) {
       const errorPaths = Object.keys(error.errors);
-      const errorMappedMessages = errorPaths.map(
-        (key) => error.errors[key].message.replace('.', '')
+      const errorMappedMessages = errorPaths.map((key) =>
+        error.errors[key].message.replace('.', '')
       );
       throw new BadRequestException(errorMappedMessages.join('; '));
     }

@@ -1,5 +1,5 @@
-import { IWithTimeStamp } from "./common.interfaces";
-import { IReview } from "./review.interfaces";
+import { IWithTimeStamp } from './common.interfaces';
+import { IReview } from './review.interfaces';
 
 export enum EMaritalStatuses {
   MARRIED = 'Married',
@@ -11,7 +11,7 @@ export enum EUserTypes {
   LANDLORD = 'Landlord',
   USER = 'User',
   ADMIN = 'Admin',
-  MAINTAINER = 'Maintainer'
+  MAINTAINER = 'Maintainer',
 }
 
 export const DEFAULT_USER: UserTypes = 'USER';
@@ -29,4 +29,6 @@ export interface IUser extends IWithTimeStamp {
   role: UserTypes;
   reviews: IReview[] | string[];
   rating: number;
+  password: string;
+  passwordChangedAt?: string;
 }

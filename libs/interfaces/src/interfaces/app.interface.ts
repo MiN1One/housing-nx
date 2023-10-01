@@ -3,5 +3,6 @@ export interface IAppConfig {
   appPort: number;
   jwtKey: string;
   jwtExpiresIn: string;
+  cookieSecret: string;
   isDevelopment: boolean;
 }

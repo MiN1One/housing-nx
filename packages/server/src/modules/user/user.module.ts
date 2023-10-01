@@ -6,10 +6,12 @@ import { MongooseModule, getModelToken } from '@nestjs/mongoose';
 import { UserController } from './user.controller';
 import { UserService } from './user.service';
 import { appConfigLoader } from '../app/app.config';
+import { AuthController } from './auth.controller';
+import { AuthService } from './auth.service';
 
 @Module({
-  controllers: [UserController],
-  providers: [UserService],
+  controllers: [UserController, AuthController],
+  providers: [UserService, AuthService],
   imports: [
     FactoryModule.forFeatureAsync({
       useFactory: (model: Model<UserDocument>, appConfig) => ({
