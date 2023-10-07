@@ -1,4 +1,8 @@
-import { Query } from "mongoose";
+import {
+  BadRequestException,
+  InternalServerErrorException,
+} from '@nestjs/common';
+import { Error, Query } from 'mongoose';
 
 export const DEFAULT_LIMIT_COUNT = 10;
 
@@ -8,8 +12,8 @@ export const API_QUERY_KEYS = [
   'limit',
   'search',
   'sort',
-  'populate'
-]; 
+  'populate',
+];
 
 export class ApiFeatures<DocumentType> {
   constructor(
@@ -27,7 +31,7 @@ export class ApiFeatures<DocumentType> {
 
   filter() {
     const queriesCopy = Object.assign({}, this.requestQuery);
-    API_QUERY_KEYS.forEach(key => delete queriesCopy[key]);
+    API_QUERY_KEYS.forEach((key) => delete queriesCopy[key]);
 
     this.mongooseQuery = this.mongooseQuery.find(queriesCopy);
 
@@ -46,7 +50,11 @@ export class ApiFeatures<DocumentType> {
 
   project() {
     if (this.requestQuery.project) {
-      const fields = this.requestQuery.project.split(',').join(' ');
+      const fields = this.requestQuery.project
+        .split(',')
+        .filter((field) => field !== 'password')
+        .join(' ');
+
       this.mongooseQuery = this.mongooseQuery.select(fields);
     } else {
       this.mongooseQuery = this.mongooseQuery.select('-__v -__t');
@@ -60,8 +68,8 @@ export class ApiFeatures<DocumentType> {
         $text: {
           $search: this.requestQuery.search,
           $caseSensitive: false,
-          $diacriticSensitive: false
-        }
+          $diacriticSensitive: false,
+        },
       });
     }
     return this;
@@ -69,7 +77,7 @@ export class ApiFeatures<DocumentType> {
 
   limit() {
     this.mongooseQuery = this.mongooseQuery.limit(
-      this.requestQuery.limit 
+      this.requestQuery.limit
         ? parseInt(this.requestQuery.limit)
         : DEFAULT_LIMIT_COUNT
     );
@@ -81,7 +89,7 @@ export class ApiFeatures<DocumentType> {
       const limit = this.requestQuery.limit
         ? parseInt(this.requestQuery.limit, 10)
         : DEFAULT_LIMIT_COUNT;
-        
+
       const page = parseInt(this.requestQuery.page, 10);
       const skip = page - 1 * limit;
 
@@ -90,3 +98,18 @@ export class ApiFeatures<DocumentType> {
     return this;
   }
 }
+
+export const throwApiException = (error: unknown, env: Record<string, any>) => {
+  if (env.isDevelopment) {
+    if (error instanceof Error.ValidationError) {
+      const errorPaths = Object.keys(error.errors);
+      const errorMappedMessages = errorPaths.map((key) =>
+        error.errors[key].message.replace('.', '')
+      );
+      throw new BadRequestException(errorMappedMessages.join('; '));
+    }
+  }
+  throw new InternalServerErrorException(
+    env.isDevelopment ? JSON.stringify(error) : 'Something went wrong!'
+  );
+};

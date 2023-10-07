@@ -1,11 +1,27 @@
-import { Inject, Injectable, Logger, NotFoundException } from "@nestjs/common";
-import { HydratedDocument, Model, Types } from "mongoose";
-import { ApiFeatures } from "../../utils/api.utils";
-import { FactoryModuleOptions, FACTORY_MODULE_TOKEN } from "./factory.module-definition";
+import { IAppConfig } from '@MiN1One/interfaces';
+import { Inject, Injectable, Logger, NotFoundException } from '@nestjs/common';
+import {
+  FilterQuery,
+  HydratedDocument,
+  Model,
+  Types,
+  UpdateQuery,
+} from 'mongoose';
+import { ApiFeatures, throwApiException } from '../../utils/api.utils';
+import {
+  FACTORY_MODULE_TOKEN,
+  FactoryModuleOptions,
+} from './factory.module-definition';
+
+interface ISingleDocumentOptions<T> {
+  select?: keyof T;
+  populate?: string[];
+}
 
 @Injectable()
-export class FactoryService {
+export class FactoryService<D = any> {
   model: Model<HydratedDocument<any>>;
+  appConfig: IAppConfig;
   modelName: string;
 
   constructor(
@@ -13,21 +29,47 @@ export class FactoryService {
     factoryModuleOptions: FactoryModuleOptions
   ) {
     this.model = factoryModuleOptions.model;
+    this.appConfig = factoryModuleOptions.appConfig;
     this.modelName = this.model.collection.name;
   }
 
-  async getDocumentsByIds<T = Array<any>>(...ids: string[]) {
+  throwError(error: unknown, context: keyof FactoryService) {
+    Logger.error(error, `FactoryService:${context}:${this.modelName}`);
+    throwApiException(error, this.appConfig);
+  }
+
+  async getDocumentsByIds<T = Array<D>>(...ids: string[]) {
     try {
-      const objectIds = ids.map(id => new Types.ObjectId(id));
+      const objectIds = ids.map((id) => new Types.ObjectId(id));
       const documents = await this.model.find({ _id: { $in: objectIds } });
       return documents as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:getDocumentsByIds:${this.modelName}`);
-      return [] as T;
+      this.throwError(er, 'getDocumentsByIds');
     }
   }
 
-  async getAllDocuments(query: Record<string, any>, ...populate: string[]) {
+  async getSingleDocumentByQuery<T = D>(
+    query: FilterQuery<T>,
+    { select, populate }: ISingleDocumentOptions<T>
+  ) {
+    try {
+      let mongoQuery = this.model.findOne(query);
+      if (select) {
+        mongoQuery = mongoQuery.select(select as string);
+      }
+      if (populate?.length) {
+        mongoQuery = mongoQuery.populate(populate);
+      }
+      return await mongoQuery.exec();
+    } catch (er) {
+      this.throwError(er, 'getSingleDocumentByQuery');
+    }
+  }
+
+  async getAllDocuments<T = Array<D>>(
+    query: FilterQuery<T>,
+    ...populate: string[]
+  ): Promise<T[] | undefined> {
     try {
       let { mongooseQuery } = new ApiFeatures(this.model.find(), query)
         .limit()
@@ -43,14 +85,16 @@ export class FactoryService {
       }
 
       const documents = await mongooseQuery;
-      return documents;
+      return documents as T[];
     } catch (er) {
-      Logger.error(er, `FactoryService:getAllDocuments:${this.modelName}`);
-      return [];
+      this.throwError(er, 'getAllDocuments');
     }
   }
 
-  async getDocument<T = any>(documentId: string, ...populate: string[]) {
+  async getDocument<T = D>(
+    documentId: string,
+    ...populate: string[]
+  ): Promise<T | undefined> {
     try {
       let query = this.model.findById(documentId);
       if (populate.length) {
@@ -62,45 +106,45 @@ export class FactoryService {
       }
       return document as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:getDocument:${this.modelName}`);
-      return {} as T;
+      this.throwError(er, 'getDocument');
     }
   }
 
-  async updateDocument(documentId: string, document: Object) {
+  async updateDocument<T = D>(
+    documentId: string,
+    update: UpdateQuery<T>
+  ): Promise<T | undefined> {
     try {
       const updatedDocument = await this.model.findByIdAndUpdate(
         documentId,
-        document,
+        update,
         { new: true }
       );
-      return updatedDocument;
+      return updatedDocument as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:updateDocument:${this.modelName}`);
-      return {};
+      this.throwError(er, 'updateDocument');
     }
   }
 
-  async deleteDocument(documentId: string) {
+  async deleteDocument(documentId: string): Promise<null | undefined> {
     try {
       const deletedDocument = await this.model.findByIdAndDelete(documentId);
       if (!deletedDocument) {
         throw new NotFoundException('Document with this id is not found');
       }
+      return null;
     } catch (er) {
-      Logger.error(er, `FactoryService:deleteDocument:${this.modelName}`);
+      this.throwError(er, 'deleteDocument');
     }
-    return null;
   }
 
-  async createDocument<T = Object>(document: T) {
+  async createDocument<T = D>(document: Partial<T>): Promise<T | undefined> {
     try {
       const createdDocument = await this.model.create(document);
       await createdDocument.save();
       return createdDocument as T;
     } catch (er) {
-      Logger.error(er, `FactoryService:createDocument:${this.modelName}`);
-      return {} as T;
+      this.throwError(er, 'createDocument');
     }
   }
 }

@@ -2,11 +2,17 @@
   "extends": "./tsconfig.json",
   "compilerOptions": {
     "outDir": "../../dist/out-tsc",
-    "module": "commonjs",
     "types": ["node"],
+    "target": "ESNext",
+    "module": "CommonJS",
+    "declaration": true,
+    "allowSyntheticDefaultImports": true,
+    "removeComments": true,
     "emitDecoratorMetadata": true,
-    "target": "es2021"
+    "incremental": true,
+    "experimentalDecorators": true,
+    "noImplicitAny": true
   },
   "exclude": ["jest.config.ts", "src/**/*.spec.ts", "src/**/*.test.ts"],
-  "include": ["src/**/*.ts"]
+  "include": ["src/**/*.ts", "src/modules/apartment-utility"]
 }
